@@ -128,6 +128,8 @@ def test_get_gameweek(test_data):
 
 def test_get_result(test_data):
 
+    "Test to check that the function returns the correct BTTS result for a game"
+
     result_one = get_result(test_data, "Wolves", "Chelsea")
     result_two = get_result(test_data, "Aston Villa", "Arsenal")
     result_three = get_result(test_data, "Brighton", "Ipswich")
@@ -138,6 +140,8 @@ def test_get_result(test_data):
 
 
 def test_get_fixtures(test_data):
+
+    """Test to check that the function returns the correct fixtures for a given gameweek"""
 
     home_teams = ["Manchester United", "Ipswich", "Arsenal", "Everton", "Newcastle United", "Nottingham Forest",
                   "West Ham", "Brentford", "Chelsea", "Leicester"]

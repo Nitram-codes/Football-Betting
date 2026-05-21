@@ -1,7 +1,56 @@
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 
-def data_sample(data_df: pd.DataFrame, home_team: str, away_team: str, prev_games: int =5) -> pd.DataFrame:
+# add exceptions and create tests
+def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  prev_games: int = 5, scale: bool = True) -> tuple:
+
+    """Function for creating the training and testing datasets. Designed for testing one week's set of fixtures at a time."""
+
+    if (start_week < 2 or start_week > 37):
+        raise Exception("Start week must be in {2, 3, 4, ..., 37}")
+    
+    if (test_week < start_week + 1 or test_week > 38):
+        raise Exception("Test week must be after start week and not greater than 38")
+    
+    training_samples = []
+    # get the data samples for each week in the given range 
+    training_fixtures = [get_fixtures(data_df, gameweek) for gameweek in range(start_week, test_week)]
+    for round in training_fixtures:
+        round_samples = [data_sample(data_df, home, away, prev_games) for home, away in round]
+        training_samples += round_samples
+
+    training_samples_df = pd.concat(training_samples)
+
+    # extract X and y from the training data
+    y_train = training_samples_df["BTTS result"].values
+    X_train_df = training_samples_df.drop("BTTS result", axis=1)    
+
+    if scale == True:
+        sc = StandardScaler()
+        X_train = sc.fit_transform(X_train_df)
+    
+    else:
+        X_train = X_train_df.to_numpy()
+
+    # get the test data
+    testing_fixtures = get_fixtures(data_df, test_week)
+    testing_samples = [data_sample(data_df, home, away) for home, away in testing_fixtures]
+    testing_samples_df = pd.concat(testing_samples)
+    X_test_df = testing_samples_df.drop("BTTS result", axis=1)
+
+    if scale == True:
+        X_test = sc.fit_transform(X_test_df)
+
+    else:
+        X_test = X_test_df.to_numpy()
+
+    y_test = testing_samples_df["BTTS result"].values
+
+    return X_train, y_train, X_test, y_test
+
+
+def data_sample(data_df: pd.DataFrame, home_team: str, away_team: str, prev_games: int = 5) -> pd.DataFrame:
 
     """Produces a data sample for given home and away teams"""
     

@@ -1,13 +1,14 @@
 import pytest
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
+from process import data_sample, get_gameweek, get_fixtures, get_result, create_datasets
 
-from process import data_sample, get_gameweek, get_fixtures, get_result
 
 @pytest.fixture
 def test_data():
 
-    df = pd.read_csv("data/test_data.csv")
+    df = pd.read_csv("data/processed.csv")
     return df
 
 
@@ -19,7 +20,7 @@ def test_data_sample_gameweek_two_prev_games_five(test_data):
     home = "West Ham"
     away = "Chelsea"
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away)
         
 
@@ -31,7 +32,7 @@ def test_data_sample_gameweek_two_prev_games_three(test_data):
     home = "Wolves"
     away = "Chelsea"
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away, prev_games=3)
 
 
@@ -43,7 +44,7 @@ def test_data_sample_gameweek_five_prev_games_five(test_data):
     home = "Leicester"
     away = "Everton"
 
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away)
 
 
@@ -159,3 +160,57 @@ def test_get_fixtures(test_data):
 
     assert fixtures_home_teams == home_teams
     assert fixtures_away_teams == away_teams
+
+
+def test_create_datasets_start_week_less_than_two(test_data):
+    
+    with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
+        create_datasets(test_data, start_week=1, test_week=30)
+
+
+def test_create_datasets_start_week_greater_than_thirty_seven(test_data):
+
+    with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
+        create_datasets(test_data, start_week=38, test_week=38)
+
+
+def test_create_datasets_test_week_less_than_start_week_plus_one(test_data):
+
+    with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
+        create_datasets(test_data, start_week=2, test_week=2)
+
+
+def test_create_datasets_test_week_greater_than_thirty_eight(test_data):
+
+    with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
+        create_datasets(test_data, start_week=36, test_week=39)
+
+
+def test_create_datasets(test_data):
+
+    training_samples = []
+    sc = StandardScaler()
+    for i in range(6, 15):
+        training_fixtures = get_fixtures(test_data, i)
+
+        for home, away in training_fixtures:
+            training_samples.append(data_sample(test_data, home, away))
+
+    training_samples_df = pd.concat(training_samples)
+    X_train_df = training_samples_df.drop("BTTS result", axis=1)
+    X_train = sc.fit_transform(X_train_df)
+    y_train = training_samples_df["BTTS result"].values
+
+    testing_fixtures = get_fixtures(test_data, 15)
+    testing_samples = [data_sample(test_data, home, away) for home, away in testing_fixtures]
+    testing_samples_df = pd.concat(testing_samples)
+    X_test_df = testing_samples_df.drop("BTTS result", axis=1)
+    X_test = sc.fit_transform(X_test_df)
+    y_test = testing_samples_df["BTTS result"].values
+
+    res1, res2, res3, res4 = create_datasets(test_data, start_week=6, test_week=15)
+
+    np.testing.assert_array_equal(X_train, res1)
+    np.testing.assert_array_equal(y_train, res2)
+    np.testing.assert_array_equal(X_test, res3)
+    np.testing.assert_array_equal(y_test, res4)

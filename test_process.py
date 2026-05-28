@@ -2,13 +2,20 @@ import pytest
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from process import data_sample, get_gameweek, get_fixtures, get_result, create_datasets
+from process import data_sample, get_gameweek, get_fixtures, get_result, create_datasets, get_BTTS_odds
 
 
 @pytest.fixture
 def test_data():
 
     df = pd.read_csv("data/processed.csv")
+    return df
+
+
+@pytest.fixture
+def test_odds():
+
+    df = pd.read_csv("data/betting_odds.csv")
     return df
 
 
@@ -214,3 +221,29 @@ def test_create_datasets(test_data):
     np.testing.assert_array_equal(y_train, res2)
     np.testing.assert_array_equal(X_test, res3)
     np.testing.assert_array_equal(y_test, res4)
+
+
+def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
+
+    with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
+        get_BTTS_odds(test_data, test_odds, 0)
+
+
+def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
+
+    with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
+        get_BTTS_odds(test_data, test_odds, 39)
+
+
+def test_get_BTTS_odds_gameweek_thirty_eight(test_data, test_odds):
+
+    home_teams = ["Bournemouth", "Fulham", "Ipswich", "Liverpool", "Manchester United", "Newcastle United",
+                  "Nottingham Forest", "Southampton", "Tottenham", "Wolves"]
+    away_teams = ["Leicester", "Manchester City", "West Ham", "Crystal Palace", "Aston Villa", "Everton",
+                  "Chelsea", "Arsenal", "Brighton", "Brentford"]
+    btts_yes = [1.72, 1.65, 1.62, 1.52, 1.6, 1.76, 1.6, 1.83, 1.48, 1.48]
+    btts_no = [2.12, 2.24, 2.31, 2.54, 2.34, 2.06, 2.34, 1.98, 2.68, 2.68]
+
+    expected_odds = list(zip(home_teams, away_teams, btts_yes, btts_no))
+
+    assert list(get_BTTS_odds(test_data, test_odds, 38)) == expected_odds

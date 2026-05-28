@@ -2,7 +2,6 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
-# add exceptions and create tests
 def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  prev_games: int = 5, scale: bool = True) -> tuple:
 
     """Function for creating the training and testing datasets. Designed for testing one week's set of fixtures at a time."""
@@ -116,7 +115,7 @@ def get_result(data_df: pd.DataFrame, home_team: str, away_team: str) -> int:
         return 0
 
 
-def get_fixtures(data_df: pd.DataFrame, gameweek: str) -> zip:
+def get_fixtures(data_df: pd.DataFrame, gameweek: int) -> zip:
 
     """Returns all fixtures for a given gameweek"""
 
@@ -129,3 +128,28 @@ def get_fixtures(data_df: pd.DataFrame, gameweek: str) -> zip:
         away_teams.append(row["away_team"])
 
     return zip(home_teams, away_teams)
+
+
+def get_BTTS_odds(data_df: pd.DataFrame, odds_df: pd.DataFrame, gameweek: int) -> zip:
+
+    """Returns fixtures and BTTS odds for a given gameweek"""
+
+    if (gameweek < 1 or gameweek > 38):
+        raise Exception("gameweek must be in {1, 2, 3, ..., 38}")
+
+    home_teams = []
+    away_teams = []
+    btts_yes = []
+    btts_no = []
+
+    fixtures = get_fixtures(data_df, gameweek)
+    for home, away in fixtures:
+        all_home = odds_df[odds_df["homeTeam"] == home]
+        match = all_home[all_home["awayTeam"] == away]
+        btts_yes.append(match["BTTSY"].values.item())
+        btts_no.append(match["BTTSN"].values.item())
+        home_teams.append(home)
+        away_teams.append(away)
+
+    return zip(home_teams, away_teams, btts_yes, btts_no)
+

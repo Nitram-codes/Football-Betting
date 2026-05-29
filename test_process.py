@@ -170,6 +170,8 @@ def test_get_fixtures(test_data):
 
 
 def test_create_datasets_start_week_less_than_two(test_data):
+
+    """Tests the function when the start week in less than two"""
     
     with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
         create_datasets(test_data, start_week=1, test_week=30)
@@ -177,11 +179,15 @@ def test_create_datasets_start_week_less_than_two(test_data):
 
 def test_create_datasets_start_week_greater_than_thirty_seven(test_data):
 
+    """Tests the function when the start week is greater than 37"""
+
     with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
         create_datasets(test_data, start_week=38, test_week=38)
 
 
 def test_create_datasets_test_week_less_than_start_week_plus_one(test_data):
+
+    """Tests the fucntion when the test week is not greater than the start week"""
 
     with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
         create_datasets(test_data, start_week=2, test_week=2)
@@ -189,11 +195,15 @@ def test_create_datasets_test_week_less_than_start_week_plus_one(test_data):
 
 def test_create_datasets_test_week_greater_than_thirty_eight(test_data):
 
+    """Tests the function when the test week is greater than 38"""
+
     with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
         create_datasets(test_data, start_week=36, test_week=39)
 
 
 def test_create_datasets(test_data):
+
+    """Tests the function returns the correct output for valid inputs"""
 
     training_samples = []
     sc = StandardScaler()
@@ -225,17 +235,23 @@ def test_create_datasets(test_data):
 
 def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
+    """Tests function when gameweek is less than one"""
+
     with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 0)
 
 
 def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
+    """Tests function when gameweek is greater than 38"""
+
     with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 39)
 
 
 def test_get_BTTS_odds_gameweek_thirty_eight(test_data, test_odds):
+
+    """Tests the function returns correct output for valid inputs"""
 
     home_teams = ["Bournemouth", "Fulham", "Ipswich", "Liverpool", "Manchester United", "Newcastle United",
                   "Nottingham Forest", "Southampton", "Tottenham", "Wolves"]

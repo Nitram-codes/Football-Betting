@@ -187,7 +187,7 @@ def test_create_datasets_start_week_greater_than_thirty_seven(test_data):
 
 def test_create_datasets_test_week_less_than_start_week_plus_one(test_data):
 
-    """Tests the fucntion when the test week is not greater than the start week"""
+    """Tests the function when the test week is not greater than the start week"""
 
     with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
         create_datasets(test_data, start_week=2, test_week=2)

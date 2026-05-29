@@ -235,7 +235,7 @@ def test_create_datasets(test_data):
 
 def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
-    """Tests function when gameweek is less than one"""
+    """Tests the function when gameweek is less than one"""
 
     with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 0)
@@ -243,7 +243,7 @@ def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
 def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
-    """Tests function when gameweek is greater than 38"""
+    """Tests the function when gameweek is greater than 38"""
 
     with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 39)

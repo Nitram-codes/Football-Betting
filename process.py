@@ -7,10 +7,10 @@ def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  pre
     """Function for creating the training and testing datasets. Designed for testing one week's set of fixtures at a time."""
 
     if (start_week < 2 or start_week > 37):
-        raise Exception("Start week must be in {2, 3, 4, ..., 37}")
+        raise ValueError("Start week must be in {2, 3, 4, ..., 37}")
     
     if (test_week < start_week + 1 or test_week > 38):
-        raise Exception("Test week must be after start week and not greater than 38")
+        raise ValueError("Test week must be after start week and not greater than 38")
     
     training_samples = []
     # get the data samples for each week in the given range 
@@ -39,7 +39,7 @@ def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  pre
     X_test_df = testing_samples_df.drop("BTTS result", axis=1)
 
     if scale == True:
-        X_test = sc.fit_transform(X_test_df)
+        X_test = sc.transform(X_test_df)
 
     else:
         X_test = X_test_df.to_numpy()
@@ -56,7 +56,7 @@ def data_sample(data_df: pd.DataFrame, home_team: str, away_team: str, prev_game
     data_df = data_df.set_index("gameweek")
     gameweek = get_gameweek(data_df, home_team, away_team)
     if gameweek <= prev_games:
-        raise Exception("Fixtures must be from gameweek {} or later in order for data to be accumulated".format(prev_games+1))
+        raise ValueError("Fixtures must be from gameweek {} or later in order for data to be accumulated".format(prev_games+1))
     
     result = get_result(data_df, home_team, away_team)
     # reduce the dataframe to the prevous 5 games
@@ -135,7 +135,7 @@ def get_BTTS_odds(data_df: pd.DataFrame, odds_df: pd.DataFrame, gameweek: int) -
     """Returns fixtures and BTTS odds for a given gameweek"""
 
     if (gameweek < 1 or gameweek > 38):
-        raise Exception("gameweek must be in {1, 2, 3, ..., 38}")
+        raise ValueError("gameweek must be in {1, 2, 3, ..., 38}")
 
     home_teams = []
     away_teams = []

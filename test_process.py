@@ -27,7 +27,7 @@ def test_data_sample_gameweek_two_prev_games_five(test_data):
     home = "West Ham"
     away = "Chelsea"
 
-    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
+    with pytest.raises(ValueError, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away)
         
 
@@ -39,7 +39,7 @@ def test_data_sample_gameweek_two_prev_games_three(test_data):
     home = "Wolves"
     away = "Chelsea"
 
-    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
+    with pytest.raises(ValueError, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away, prev_games=3)
 
 
@@ -51,7 +51,7 @@ def test_data_sample_gameweek_five_prev_games_five(test_data):
     home = "Leicester"
     away = "Everton"
 
-    with pytest.raises(Exception, match=r"Fixtures must be from gameweek"):
+    with pytest.raises(ValueError, match=r"Fixtures must be from gameweek"):
         data_sample(test_data, home, away)
 
 
@@ -173,7 +173,7 @@ def test_create_datasets_start_week_less_than_two(test_data):
 
     """Tests the function when the start week in less than two"""
     
-    with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
+    with pytest.raises(ValueError, match=r"Start week must be in {2, 3, 4, ..., 37}"):
         create_datasets(test_data, start_week=1, test_week=30)
 
 
@@ -181,7 +181,7 @@ def test_create_datasets_start_week_greater_than_thirty_seven(test_data):
 
     """Tests the function when the start week is greater than 37"""
 
-    with pytest.raises(Exception, match=r"Start week must be in {2, 3, 4, ..., 37}"):
+    with pytest.raises(ValueError, match=r"Start week must be in {2, 3, 4, ..., 37}"):
         create_datasets(test_data, start_week=38, test_week=38)
 
 
@@ -189,7 +189,7 @@ def test_create_datasets_test_week_less_than_start_week_plus_one(test_data):
 
     """Tests the function when the test week is not greater than the start week"""
 
-    with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
+    with pytest.raises(ValueError, match=r"Test week must be after start week and not greater than 38"):
         create_datasets(test_data, start_week=2, test_week=2)
 
 
@@ -197,7 +197,7 @@ def test_create_datasets_test_week_greater_than_thirty_eight(test_data):
 
     """Tests the function when the test week is greater than 38"""
 
-    with pytest.raises(Exception, match=r"Test week must be after start week and not greater than 38"):
+    with pytest.raises(ValueError, match=r"Test week must be after start week and not greater than 38"):
         create_datasets(test_data, start_week=36, test_week=39)
 
 
@@ -222,7 +222,7 @@ def test_create_datasets(test_data):
     testing_samples = [data_sample(test_data, home, away) for home, away in testing_fixtures]
     testing_samples_df = pd.concat(testing_samples)
     X_test_df = testing_samples_df.drop("BTTS result", axis=1)
-    X_test = sc.fit_transform(X_test_df)
+    X_test = sc.transform(X_test_df)
     y_test = testing_samples_df["BTTS result"].values
 
     res1, res2, res3, res4 = create_datasets(test_data, start_week=6, test_week=15)
@@ -237,15 +237,15 @@ def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
 
     """Tests the function when gameweek is less than one"""
 
-    with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
+    with pytest.raises(ValueError, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 0)
 
 
-def test_get_BTTS_odds_gameweek_less_than_one(test_data, test_odds):
+def test_get_BTTS_odds_gameweek_greater_than_thirty_eight(test_data, test_odds):
 
     """Tests the function when gameweek is greater than 38"""
 
-    with pytest.raises(Exception, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
+    with pytest.raises(ValueError, match=r"gameweek must be in {1, 2, 3, ..., 38}"):
         get_BTTS_odds(test_data, test_odds, 39)
 
 

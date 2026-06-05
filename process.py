@@ -24,14 +24,6 @@ def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  pre
     # extract X and y from the training data
     y_train = training_samples_df["BTTS result"].values
     X_train_df = training_samples_df.drop("BTTS result", axis=1)    
-
-    if scale == True:
-        sc = StandardScaler()
-        X_train = sc.fit_transform(X_train_df)
-    
-    else:
-        X_train = X_train_df.to_numpy()
-
     # get the test data
     testing_fixtures = get_fixtures(data_df, test_week)
     testing_samples = [data_sample(data_df, home, away) for home, away in testing_fixtures]
@@ -39,9 +31,12 @@ def create_datasets(data_df: pd.DataFrame, start_week: int, test_week: int,  pre
     X_test_df = testing_samples_df.drop("BTTS result", axis=1)
 
     if scale == True:
+        sc = StandardScaler()
+        X_train = sc.fit_transform(X_train_df)
         X_test = sc.transform(X_test_df)
 
     else:
+        X_train = X_train_df.to_numpy()
         X_test = X_test_df.to_numpy()
 
     y_test = testing_samples_df["BTTS result"].values

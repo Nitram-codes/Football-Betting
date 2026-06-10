@@ -11,7 +11,7 @@ class NeuralNetwork(nn.Module):
         self.hidden_two = hidden_two
 
 
-    def create(self):
+    def generate(self):
         self.model = nn.Sequential(
             nn.Linear(self.features, self.hidden_one),
             nn.ReLU(),
@@ -22,7 +22,7 @@ class NeuralNetwork(nn.Module):
 
     def configure(self, learning_rate=1e-3, weight_decay=1e-2):
 
-        self.loss_function = nn.CrossEntropyLoss()
+        self.loss_function = nn.BCEWithLogitsLoss()
         self.optimiser = torch.optim.AdamW(params=self.model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     
     
@@ -49,7 +49,7 @@ class NeuralNetwork(nn.Module):
 
         self.model.eval()
         logits = self.model(X_test)
-        y_pred = nn.Softmax()(logits)
+        y_pred = nn.Sigmoid()(logits)
 
         return y_pred
 

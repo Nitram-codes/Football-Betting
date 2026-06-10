@@ -17,7 +17,7 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(self.hidden_one, self.hidden_two),
             nn.ReLU(),
-            nn.Linear(self.hidden_two, 2),
+            nn.Linear(self.hidden_two, 1),
         )
 
     def configure(self, learning_rate=1e-3, weight_decay=1e-2):

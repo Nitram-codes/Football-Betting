@@ -38,7 +38,7 @@ class NeuralNetwork(nn.Module):
         for epoch in range(epochs):
 
             y_pred = self.model(X_train)
-            loss = self.loss_function(y_pred, y_train)
+            loss = self.loss_function(y_pred.squeeze(1), y_train.float())
 
             loss.backward()
             self.optimiser.step()

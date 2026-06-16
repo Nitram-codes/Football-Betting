@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from process import data_sample, get_gameweek, get_fixtures, get_result, create_datasets, get_BTTS_odds
+from process import data_sample, get_gameweek, get_fixtures, get_result, create_datasets, get_BTTS_odds, attack_strength_home, attack_strength_away, defence_strength_home, defence_strength_away, expected_goals_home, expected_goals_away
 
 
 @pytest.fixture
@@ -263,3 +263,187 @@ def test_get_BTTS_odds_gameweek_thirty_eight(test_data, test_odds):
     expected_odds = list(zip(home_teams, away_teams, btts_yes, btts_no))
 
     assert list(get_BTTS_odds(test_data, test_odds, 38)) == expected_odds
+
+
+def test_attack_strength_home_gameweek_equal_prev_games(test_data):
+
+    """Tests the function when gameweek = prev_games"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be greater than the number of past games data is collated from"):
+        attack_strength_home(test_data, "Tottenham", 6)
+
+
+def test_attack_strength_home_gameweek_less_than_two(test_data):
+
+    """Tests the function when gameweek < 2"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        attack_strength_home(test_data, "Brentford", 1)
+
+
+def test_attack_strength_home_gameweek_less_than_two(test_data):
+
+    """Tests the function when gameweek > 38"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        attack_strength_home(test_data, "Tottenham", 39)
+
+
+def test_attack_strength_home(test_data):
+
+    """Tests the function for valid input"""
+
+    actual_result_mc = attack_strength_home(test_data, "Manchester City", 8)
+    expected_result_mc = ((4 + 2 + 2 + 3) / 4) / (95 / 60)
+
+    actual_result_ars = attack_strength_home(test_data, "Arsenal", 26, 9)
+    expected_result_ars = ((5 + 2 + 2 + 1) / 4) / (128 / 91)
+
+    assert actual_result_mc == expected_result_mc
+    assert actual_result_ars == expected_result_ars
+
+
+def test_attack_strength_away_gameweek_equal_prev_games(test_data):
+
+    """Tests the function when gameweek = prev_games"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be greater than the number of past games data is collated from"):
+        attack_strength_away(test_data, "Fulham", 6)
+
+
+def test_attack_strength_away_gameweek_less_than_two(test_data):
+
+    """Tests the function when gameweek < 2"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        attack_strength_away(test_data, "Fulham", 1)
+
+
+def test_attack_strength_away_gameweek_greater_than_thirty_eight(test_data):
+
+    """Tests the function when gameweek > 38"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        attack_strength_away(test_data, "Ipswich", 39)
+
+
+def test_attack_strength_away(test_data):
+
+    """Tests the function for valid input"""
+
+    actual_result_av = attack_strength_away(test_data, "Aston Villa", 38)
+    expected_result_av = ((3 + 1 + 1) / 3) / (74 / 60)
+
+    actual_result_che = attack_strength_away(test_data, "Chelsea", 13, 4)
+    expected_result_che = ((2 + 1) / 2) / (53 / 40)
+
+    assert actual_result_av == expected_result_av
+    assert actual_result_che == expected_result_che
+
+
+def test_defence_strength_home_gameweek_equal_prev_games(test_data):
+
+    """Tests the function when gameweek = prev_games"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be greater than the number of past games data is collated from"):
+        defence_strength_home(test_data, "Tottenham", 6)
+
+
+def test_defence_strength_home_gameweek_less_than_two(test_data):
+
+    """Tests the function when gameweek < 2"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        defence_strength_home(test_data, "Ipswich", 1)
+
+
+def test_defence_strength_home_gameweek_greater_than_thrity_eight(test_data):
+
+    """Tests the function when gameweek > 38"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        defence_strength_home(test_data, "Tottenham", 39)
+
+
+def test_defence_strength_home(test_data):
+
+    """Tests the function with valid input"""
+
+    actual_result_liv = defence_strength_home(test_data, "Nottingham Forest", 38)
+    expected_result_liv = ((2 + 2 + 1) / 3) / (74 / 60)
+
+    actual_result_ev = defence_strength_home(test_data, "Everton", 17, prev_games=8)
+    expected_result_ev = ((2 + 0 + 0 + 1) / 4) / (114 / 80)
+
+    assert actual_result_liv == expected_result_liv
+    assert actual_result_ev == expected_result_ev
+
+
+def test_defence_strength_away_gameweek_equal_prev_games(test_data):
+
+    """Tests the function when gameweek = prev_games"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be greater than the number of past games data is collated from"):
+        defence_strength_away(test_data, "Brighton", 6)
+
+
+def test_defence_strength_away_gameweek_less_than_two(test_data):
+
+    """Tests the function when gameweek < 2"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        defence_strength_away(test_data, "Brighton", 1)
+
+
+def test_defence_strength_away_gameweek_greater_than_thrity_eight(test_data):
+
+    """Tests the function when gameweek > 38"""
+
+    with pytest.raises(ValueError, match=r"gameweek must be in {2, 3, 4, ..., 38}"):
+        defence_strength_away(test_data, "Tottenham", 39)
+
+
+def test_defence_strength_away(test_data):
+
+    """Tests the function with valid input"""
+
+    actual_result_ful = defence_strength_away(test_data, "Fulham", 22)
+    expected_result_ful = ((3 + 1 + 2) / 3) / (74 / 60)
+
+    actual_result_cp = defence_strength_away(test_data, "Crystal Palace", 30, prev_games=8)
+    expected_result_cp = ((5 + 0 + 0 + 0) / 4) / (123 / 80)
+
+    assert actual_result_ful == expected_result_ful
+    assert actual_result_cp == expected_result_cp
+
+
+def test_expected_goals_home(test_data):
+
+    """Tests the function with valid input"""
+
+    actual_result_mu = expected_goals_home(test_data, "Manchester United", "Southampton", 21, prev_games=8)
+    expected_result_mu = (((0 + 0 + 2 + 4) / 4) * ((2 + 0 + 1 + 1) / 4)) / (122 / 80)
+
+    actual_result_che = expected_goals_home(test_data, "Chelsea", "Liverpool", 35)
+    expected_result_che = ((1 + 2 + 1) / 3) * ((0 + 3) / 2) / (91 / 59)
+
+    assert actual_result_mu == pytest.approx(expected_result_mu)
+    assert actual_result_che == pytest.approx(expected_result_che)
+
+
+def test_expected_goals_away(test_data):
+
+    """Tests the function with valid input"""
+
+    actual_result_br = expected_goals_away(test_data, "Manchester United", "Brentford", 8, prev_games=7)
+    expected_result_br = (((1 + 1 + 0) / 3) * ((0 + 3 + 3) / 3)) / (97 / 70)
+
+    actual_result_ar = expected_goals_away(test_data, "Brighton", "Arsenal", 20)
+    expected_result_ar = (((3 + 5 + 1) / 3) * ((3 + 0) / 2)) / (99 / 60)
+
+    assert actual_result_br == pytest.approx(expected_result_br)
+    assert actual_result_ar == pytest.approx(expected_result_ar)
+
+
+
+

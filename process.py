@@ -148,3 +148,109 @@ def get_BTTS_odds(data_df: pd.DataFrame, odds_df: pd.DataFrame, gameweek: int) -
 
     return zip(home_teams, away_teams, btts_yes, btts_no)
 
+
+def attack_strength_home(data_df: pd.DataFrame, team: str, gameweek: int, prev_games: int = 6) -> float: 
+
+    """Returns the attack strength for the home team"""
+
+    if (gameweek < 2) or (gameweek > 38):
+        raise ValueError("gameweek must be in {2, 3, 4, ..., 38}")
+    
+    if prev_games >= gameweek:
+        raise ValueError("gameweek must be greater than the number of past games data is collated from")
+    
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    home = data_df[data_df["home_team"] == team]
+    home_goals_avg = home["home_score"].sum().item() / len(home) 
+    league_home_goals_avg = data_df["home_score"].sum().item() / len(data_df)
+
+    return home_goals_avg / league_home_goals_avg
+
+
+def attack_strength_away(data_df: pd.DataFrame, team: str, gameweek: int, prev_games: int = 6) -> float: 
+
+    """Returns the attack strength for the away team"""
+    
+    if (gameweek < 2) or (gameweek > 38):
+        raise ValueError("gameweek must be in {2, 3, 4, ..., 38}")
+    
+    if prev_games >= gameweek:
+        raise ValueError("gameweek must be greater than the number of past games data is collated from")
+    
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    away = data_df[data_df["away_team"] == team]
+    away_goals_avg = away["away_score"].sum().item() / len(away) 
+    league_away_goals_avg = data_df["away_score"].sum().item() / len(data_df)
+
+    return away_goals_avg / league_away_goals_avg
+
+
+def defence_strength_home(data_df: pd.DataFrame, team: str, gameweek: int, prev_games: int = 6) -> float:
+
+    """Returns the defence strength for the home team"""
+
+    if (gameweek < 2) or (gameweek > 38):
+        raise ValueError("gameweek must be in {2, 3, 4, ..., 38}")
+    
+    if prev_games >= gameweek:
+        raise ValueError("gameweek must be greater than the number of past games data is collated from")
+    
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    home = data_df[data_df["home_team"] == team]
+    home_conceded_avg = home["away_score"].sum().item() / len(home) 
+    league_home_conceded_avg = data_df["away_score"].sum().item() / len(data_df)
+
+    return home_conceded_avg / league_home_conceded_avg
+
+
+def defence_strength_away(data_df: pd.DataFrame, team: str, gameweek: int, prev_games: int = 6) -> float:
+
+    """Returns the defence strength for the away team"""
+
+    if (gameweek < 2) or (gameweek > 38):
+        raise ValueError("gameweek must be in {2, 3, 4, ..., 38}")
+    
+    if prev_games >= gameweek:
+        raise ValueError("gameweek must be greater than the number of past games data is collated from")
+    
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    away = data_df[data_df["away_team"] == team]
+    away_conceded_avg = away["home_score"].sum().item() / len(away) 
+    league_away_conceded_avg = data_df["home_score"].sum().item() / len(data_df)
+
+    return away_conceded_avg / league_away_conceded_avg
+
+
+def expected_goals_home(data_df: pd.DataFrame, home_team: str, away_team: str, gameweek: int, prev_games = 6) -> float:
+
+    """Returns the expected goals for the home team"""
+
+    home_attack = attack_strength_home(data_df, home_team, gameweek, prev_games)
+    away_defence = defence_strength_away(data_df, away_team, gameweek, prev_games)
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    league_home_goals_avg = data_df["home_score"].sum().item() / len(data_df)
+
+    return home_attack*away_defence*league_home_goals_avg
+
+
+def expected_goals_away(data_df: pd.DataFrame, home_team: str, away_team: str, gameweek: int, prev_games = 6) -> float:
+
+    """Returns the expected goals for the home team"""
+
+    away_attack = attack_strength_away(data_df, away_team, gameweek, prev_games)
+    print(away_attack)
+    home_defence = defence_strength_home(data_df, home_team, gameweek, prev_games)
+    print(home_defence)
+    data_df = data_df.set_index("gameweek")
+    data_df = data_df.loc[gameweek-prev_games:gameweek-1]
+    league_away_goals_avg = data_df["away_score"].sum().item() / len(data_df)
+    print(league_away_goals_avg)
+
+    return away_attack*home_defence*league_away_goals_avg
+
+

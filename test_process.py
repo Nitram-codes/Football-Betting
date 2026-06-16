@@ -281,7 +281,7 @@ def test_attack_strength_home_gameweek_less_than_two(test_data):
         attack_strength_home(test_data, "Brentford", 1)
 
 
-def test_attack_strength_home_gameweek_less_than_two(test_data):
+def test_attack_strength_home_gameweek_greater_than_thirty_eight(test_data):
 
     """Tests the function when gameweek > 38"""
 
@@ -357,7 +357,7 @@ def test_defence_strength_home_gameweek_less_than_two(test_data):
         defence_strength_home(test_data, "Ipswich", 1)
 
 
-def test_defence_strength_home_gameweek_greater_than_thrity_eight(test_data):
+def test_defence_strength_home_gameweek_greater_than_thirty_eight(test_data):
 
     """Tests the function when gameweek > 38"""
 
@@ -395,7 +395,7 @@ def test_defence_strength_away_gameweek_less_than_two(test_data):
         defence_strength_away(test_data, "Brighton", 1)
 
 
-def test_defence_strength_away_gameweek_greater_than_thrity_eight(test_data):
+def test_defence_strength_away_gameweek_greater_than_thirty_eight(test_data):
 
     """Tests the function when gameweek > 38"""
 

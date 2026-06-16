@@ -243,13 +243,10 @@ def expected_goals_away(data_df: pd.DataFrame, home_team: str, away_team: str, g
     """Returns the expected goals for the home team"""
 
     away_attack = attack_strength_away(data_df, away_team, gameweek, prev_games)
-    print(away_attack)
     home_defence = defence_strength_home(data_df, home_team, gameweek, prev_games)
-    print(home_defence)
     data_df = data_df.set_index("gameweek")
     data_df = data_df.loc[gameweek-prev_games:gameweek-1]
     league_away_goals_avg = data_df["away_score"].sum().item() / len(data_df)
-    print(league_away_goals_avg)
 
     return away_attack*home_defence*league_away_goals_avg
 
